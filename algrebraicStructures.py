@@ -1,6 +1,3 @@
-from xml import dom
-
-
 class Complex:
    def __init__(self, newA, newB):
       self.values = (newA, newB)
@@ -38,33 +35,30 @@ class Complex:
       if self.values[0] == 0:
          return str(self.values[1]) + "i"
       return str(self.values[0]) + " + " + str(self.values[1]) + "i"
-complexe1 = Complex(0, 1);
-
 class Polynomials:
-
    def __init__(self, *args):    
       self.coefs = self.cutZeroes(args)
       self.exponents = [*range(0, len(self.coefs))]
 
       self.degree = self.getDegree()
       self.valuation = self.getValuation()
-
    def __str__(self):
       polynomial = ""
+      coefs = tuple(reversed(self.coefs))
       if (self.degree == "-inf"):
          return "0K[X]"
-      for i in range(len(self.coefs)):
-         if self.coefs[i] == 0:
+      for i in range(len(coefs)):
+         if coefs[i] == 0:
             continue
-         if i == 0:
-            polynomial += f"{self.coefs[i]}"
-         elif i == 1:
-            polynomial += f"{self.coefs[i]}X"
-         else:
-            polynomial += f"{self.coefs[i]}X^{i}"
-
-         if i != len(self.coefs) - 1:
+         if i != 0:
             polynomial += " + "
+         if i == len(coefs) - 1:
+            polynomial += f"{coefs[i]}"
+         elif i == len(coefs) - 2:
+            polynomial += f"{coefs[i]}X"
+         else:
+            polynomial += f"{coefs[i]}X^{len(coefs) - 1 - i}"
+
       return polynomial
    def __add__(self, polynomial):   
       list = []
@@ -128,31 +122,25 @@ class Polynomials:
             Polynomials(*quotient),
             rest
          ]
+      return rest.__truediv__(divisor, quotient)
 
-      else:
-         return rest.__truediv__(divisor, quotient)
-
-
-   def differentiate(self):
+   # Dérivée n-ième OK
+   def differentiate(self, n = 1):
       list = []
       for i in range(1, len(self.coefs)):
          newCoef = self.coefs[i] * self.exponents[i]
          list.append(newCoef)
-      return Polynomials(*list)
-   def integrate(self):
-      list = []
-      list.append("Constant")
-      for i in range(len(self.coefs)):
-         # Bugué
-         print("index", i)
-         print("coef", self.coefs[i])
-         newCoef = self.coefs[i] / (i + 1)
 
-         list.append(newCoef)
-         print("list", list)
-         print("newcoef at line", i, newCoef)
+      result = Polynomials(*list)
+      if (n == 1):
+         return result
+      return result.differentiate(n - 1)   
+   # Primitive n-ième ?
+   def integrate(self):
+      list = [0] * (self.degree + 2)
+      list[0] = "Constant"
+      for i in range(len(self.coefs)): list[i + 1] = round(self.coefs[i] / (i + 1), 3)
          
-      print(list)
       return Polynomials(*list)
 
    def cutZeroes(self, args):
@@ -177,9 +165,13 @@ class Polynomials:
             continue
          return i
 
+# # # # # # # # # # #  TEST # # # # # # # # # # # # # # 
 
-poly = Polynomials(6, 5, 32)
-poly2 = Polynomials(6, 5, 32)
+complexe1 = Complex(0, 1);
 
-euclidean = poly / poly2
-print(euclidean[1])
+poly = Polynomials(2, 1, 5, 6, 0, 2, 65, 32, 1235, 12, 3, 5 ,215)
+print(poly.differentiate(12))
+
+# poly2 = Polynomials(6, 5, 2)
+# division = poly / poly2
+# print(f"Quotient : {division[0]}, Reste: {division[1]}")
