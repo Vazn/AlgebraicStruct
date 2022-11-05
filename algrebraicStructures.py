@@ -1,10 +1,26 @@
-class Complex:
-   def __init__(self, newA, newB):
-      self.values = (newA, newB)
+from math import *
 
+from numpy import arccos
+
+class Complex:
+   def __init__(self, real, imaginary):
+      self.values = (real, imaginary)    
+      self.modulus = sqrt(real**2 + imaginary**2)
+      self.argument = arccos(real / self.modulus)
+
+   def __str__(self):
+      realPart = str(self.values[0])
+      complexPart = str(self.values[1]) + "i" if abs(self.values[1]) != 1 else "i"
+
+      if self.values[0] == 0: 
+         if (self.values[1] < 0):
+            return "- " + complexPart
+         return complexPart
+      if self.values[1] < 0: return realPart + " - " + complexPart
+      if self.values[1] == 0: return realPart
+      return realPart + " + " + complexPart
    def __add__(self, complex):
       return Complex(self.values[0] + complex.values[0], self.values[1] + complex.values[1])
-
    def __mul__(self, complex):
       imaginary1 = self.values[1]
       imaginary2 = complex.values[1]
@@ -29,12 +45,10 @@ class Complex:
 
       return Complex(resultReal, resultIm)
 
-   def __str__(self):
-      if self.values[1] == 0:
-         return str(self.values[0])
-      if self.values[0] == 0:
-         return str(self.values[1]) + "i"
-      return str(self.values[0]) + " + " + str(self.values[1]) + "i"
+   def conjugate(self): 
+      return Complex(self.values[0], -self.values[1])
+
+
 class Polynomials:
    def __init__(self, *args):    
       self.coefs = self.cutZeroes(args)
@@ -167,11 +181,12 @@ class Polynomials:
 
 # # # # # # # # # # #  TEST # # # # # # # # # # # # # # 
 
-complexe1 = Complex(0, 1);
+complex1 = Complex(-5, 1);
+print(complex1.conjugate())
 
-poly = Polynomials(2, 1, 5, 6, 0, 2, 65, 32, 1235, 12, 3, 5 ,215)
-print(poly.differentiate(12))
+poly = Polynomials(2, 1, 5, 6, 0, 25)
+# print(poly.differentiate(10))
 
-# poly2 = Polynomials(6, 5, 2)
-# division = poly / poly2
-# print(f"Quotient : {division[0]}, Reste: {division[1]}")
+poly2 = Polynomials(6, 5, 2)
+division = poly / poly2
+print(f"Quotient : {division[0]}, Reste: {division[1]}")
